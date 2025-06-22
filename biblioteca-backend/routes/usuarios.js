@@ -2,10 +2,20 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = (pool) => {
-  // Listar todos os usuários
+  // Listar usuários com filtro de nome e cpf
+
   router.get('/', async (req, res) => {
+    const nome = req.query.nome;
     try {
-      const [rows] = await pool.query('SELECT * FROM usuarios');
+      let query = 'SELECT * FROM usuarios';
+      let params = [];
+
+      if (nome) {
+        query += ' WHERE nome_completo LIKE ? OR cpf LIKE ?';
+        params.push(`%${nome}%`, `%${nome}%`);
+      }
+
+      const [rows] = await pool.query(query, params);
       res.json(rows);
     } catch (err) {
       console.error(err);

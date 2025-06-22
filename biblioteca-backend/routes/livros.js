@@ -2,10 +2,20 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = (pool) => {
-  // Listar todos os livros
+  // Listar livros com busca por título e autor
   router.get('/', async (req, res) => {
     try {
-      const [rows] = await pool.query('SELECT * FROM livros');
+      const { titulo } = req.query;
+
+      let query = 'SELECT * FROM livros';
+      let params = [];
+
+      if (busca) {
+        query += ' WHERE titulo LIKE ? OR autor LIKE ?';
+        params.push(`%${busca}%`, `%${busca}%`);
+      }
+
+      const [rows] = await pool.query(query, params);
       res.json(rows);
     } catch (err) {
       console.error(err);

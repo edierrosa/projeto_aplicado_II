@@ -4,7 +4,17 @@ module.exports = (db) => {
 
   router.get('/', async (req, res) => {
     try {
-      const [rows] = await db.query('SELECT * FROM vw_disponibilidade');
+      const { busca } = req.query;
+
+      let query = 'SELECT * FROM vw_disponibilidade';
+      let params = [];
+
+      if (busca) {
+        query += ' WHERE titulo LIKE ? OR autor LIKE ?';
+        params.push(`%${busca}%`, `%${busca}%`);
+      }
+
+      const [rows] = await db.query(query, params);
       res.json(rows);
     } catch (err) {
       console.error('Erro ao buscar disponibilidade:', err);
